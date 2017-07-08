@@ -2,11 +2,13 @@
 
 import sys
 import socket
+import struct
 
 # Campo
-CLIREQ = '01'
-QUERY = '02'
-TTL = '03'
+CLIREQ = 1
+QUERY = 2
+TTL = 3
+RESPONSE = 3
 
 # Recebendo porta
 PORT = int(sys.argv[1])
@@ -26,23 +28,37 @@ print UDP_IP
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
 
-# Array de vizinhos
+# Arrays
+dicionario = []
 arrayVizinhos = []
+mensagensLidas = []
 
-KV = open(arquivo,'r') 
-for line in KV: 
-  arrayVizinhos.append(line.strip('\n'))
+# Vizinhos 
+vizinhos = sys.argv[3:]
+for i in vizinhos:
+  arrayVizinhos.append(i)
 
 for i in arrayVizinhos:
   print i
+
+chaves = open(arquivo,'r') 
+for line in chaves: 
+  if not line.startswith("#"):
+    dicionario.append(line.strip('\n'))
+
+for i in dicionario:
+  print i.split()[0], i.split()[1], i.split()[2], i.split()[3]
+
+#print struct.pack('>H', 1)
 
 # Aguardando mensagens
 while True:
   data, addr = sock.recvfrom(1024) 
   print "received message:", data
   print addr
-  print data[0:2]
-  if data[0:2] == CLIREQ:
+  dados = struct.unpack('>H', data[0:2])[0]
+  print data[0:2], dados
+  if data[0:2] == struct.pack('>H', CLIREQ):
     # Enviando mensagem ao client
     print "enviando ", data[2:]
     sock.sendto(data, addr)
@@ -61,6 +77,21 @@ while True:
       portaVizinho = int(i.split(':')[1])
       sock.sendto(query, (ipVizinho,portaVizinho))
   if data[0:2] == QUERY:
-    print "bla"
-
+    print "QUERY"
+    # Adicionando a mensagem a array de Mensagens
+    ipCliente = socket.inet_ntoa(data[4:8])
+    portaCliente = int(data[8:13])
+    resto = data[8:]
+    chave = data[17:]
+    mensagem = ipCliente + resto
+    if mensagem not in mensagensLidas:
+      # Adiciona a mensagem as mensagens lidas afim de evitar repeticoes
+      mensagensLidas.append(mensagem)
+      # E confere se a chave esta no seu dicionario local
+      for i in dicionario:
+        chaveDicionario = i.split()[0]
+        # Se encontrar a chave no dicionario
+        if chave == chaveDicionario:
+ 	  response = RESPONSE + i.split()
+   	  sock.sendto(response, (ipCliente,portaCliente))
   
