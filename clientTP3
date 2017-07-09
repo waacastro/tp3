@@ -28,9 +28,11 @@ try:
   data, addr = sock.recvfrom(1024)
   print "received message:", data
 
+# Reenvia
 except:
   sock.sendto(mensagemFinal, (UDP_IP, UDP_PORT))
 
+# Aguarda 4s por outras respostas
 while True:
   sock.settimeout(4)
   data, addr = sock.recvfrom(1024)
