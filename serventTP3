@@ -78,10 +78,10 @@ while True:
     print "QUERY"
     # Adicionando a mensagem a array de Mensagens
     ipCliente = socket.inet_ntoa(data[4:8])
-    portaCliente = struct.unpack('>H', query[8:10])[0]
-    sequenciaCliente = struct.unpack('>H', query[10:12])[0]
+    portaCliente = struct.unpack('>H', data[8:10])[0]
+    sequenciaCliente = struct.unpack('>H', data[10:12])[0]
     chave = data[14:]
-    mensagem = ipCliente + portaCliente + sequenciaCliente + chave
+    mensagem = ipCliente + str(portaCliente) + str(sequenciaCliente) + chave
     if mensagem not in mensagensLidas:
       # Adiciona a mensagem as mensagens lidas afim de evitar repeticoes
       mensagensLidas.append(mensagem)
@@ -90,11 +90,11 @@ while True:
         chaveDicionario = i.split()[0]
         # Se encontrar a chave no dicionario
         if chave == chaveDicionario:
- 	  response = struct.pack('>H', RESPONSE) + i.split()
+ 	  response = struct.pack('>H', RESPONSE) + ' '.join(i.split())
    	  sock.sendto(response, (ipCliente,portaCliente))
     # Se repetida, reenvia para os vizinhos apenas se o TTL for maior que zero
     else:
-      novoTTL = int(struct.unpack('>H', query[2:4])[0])
+      novoTTL = int(struct.unpack('>H', data[2:4])[0])
       novoTTL = novoTTL - 1
       if novoTTL > 0:
 	novaMensagem = data[0:2] + struct.pack('>H', novoTTL) + data[4:]
