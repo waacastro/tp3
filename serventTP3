@@ -72,7 +72,7 @@ while True:
       if chave == chaveDicionario:
         achouChave = 1
  	response = struct.pack('>H', RESPONSE) + ' '.join(i.split())
-   	sock.sendto(response, (ipCliente,portaCliente))      
+    sock.sendto(response, (ipCliente,portaCliente))      
     # Senao, montar QUERY
     if achouChave == 0:
       contMSG = contMSG + 1
@@ -97,7 +97,9 @@ while True:
     sequenciaCliente = struct.unpack('>H', data[10:12])[0]
     chave = data[14:]
     mensagem = ipCliente + str(portaCliente) + str(sequenciaCliente) + chave
+
     if mensagem not in mensagensLidas:
+      response = ''
       # Adiciona a mensagem as mensagens lidas afim de evitar repeticoes
       mensagensLidas.append(mensagem)
       # E confere se a chave esta no seu dicionario local
@@ -106,8 +108,8 @@ while True:
         # Se encontrar a chave no dicionario
         if chave == chaveDicionario:
           achouChave = 1
- 	  response = struct.pack('>H', RESPONSE) + ' '.join(i.split())
-   	  sock.sendto(response, (ipCliente,portaCliente))
+ 	  response = response + struct.pack('>H', RESPONSE) + ' '.join(i.split())
+      sock.sendto(response, (ipCliente,portaCliente))
     # Se repetida, reenvia para os vizinhos apenas se o TTL for maior que zero
     else:
       novoTTL = int(struct.unpack('>H', data[2:4])[0])
