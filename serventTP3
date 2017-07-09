@@ -112,6 +112,7 @@ while True:
         if chave == chaveDicionario:
           achouChave = 1
  	  response = struct.pack('>H', RESPONSE) + ' '.join(i.split())
+      # Envia para o client
       if achouChave == 1:
         sock.sendto(response, (ipCliente,portaCliente))
     # Se repetida, reenvia para os vizinhos apenas se o TTL for maior que zero
