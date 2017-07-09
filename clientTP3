@@ -23,7 +23,15 @@ mensagemFinal = struct.pack('>H', CLIREQ) + MESSAGE
 sock.sendto(mensagemFinal, (UDP_IP, UDP_PORT))
 
 # Aguardando resposta
-sock.settimeout(4)
-data, addr = sock.recvfrom(1024)
-print "received message:", data
+try:
+  sock.settimeout(4)
+  data, addr = sock.recvfrom(1024)
+  print "received message:", data
 
+except:
+  sock.sendto(mensagemFinal, (UDP_IP, UDP_PORT))
+
+while True:
+  sock.settimeout(4)
+  data, addr = sock.recvfrom(1024)
+  print "received message:", data
