@@ -22,7 +22,7 @@ MESSAGE = raw_input()
 mensagemFinal = struct.pack('>H', CLIREQ) + MESSAGE
 sock.sendto(mensagemFinal, (UDP_IP, UDP_PORT))
 
-# Recebendo resposta do Servent
+# Aguardando resposta
 sock.settimeout(4)
 data, addr = sock.recvfrom(1024)
 print "received message:", data
