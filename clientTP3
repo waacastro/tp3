@@ -27,7 +27,8 @@ try:
   sock.settimeout(4)
   data, addr = sock.recvfrom(1024)
   resposta = ' '.join(data.split()[1:])
-  print "Resposta:", resposta
+  chave = data.split()[0]
+  print "Resposta:", chave[2:], resposta 
 
 # Reenvia
 except:
@@ -37,4 +38,5 @@ except:
     sock.settimeout(4)
     data, addr = sock.recvfrom(1024)
     resposta = ' '.join(data.split()[1:])
-    print "Resposta: ",resposta
+    chave = data.split()[0]
+    print "Resposta: ",chave[2:], resposta

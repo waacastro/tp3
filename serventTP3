@@ -22,7 +22,6 @@ contMSG = 0
 # IP e porta 
 UDP_IP = socket.gethostbyname(socket.gethostname())
 UDP_PORT = PORT
-print UDP_IP
 
 # Socket UDP
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,17 +37,11 @@ vizinhos = sys.argv[3:]
 for i in vizinhos:
   arrayVizinhos.append(i)
 
-for i in arrayVizinhos:
-  print i
-
 # Criando o dicionario
 chaves = open(arquivo,'r') 
 for line in chaves: 
   if not line.startswith("#"):
     dicionario.append(line.strip('\n'))
-
-for i in dicionario:
-  print i.split()[0], i.split()[1], i.split()[2], i.split()[3]
 
 # Variavel que confirma se achou a chave
 achouChave = 0
@@ -56,12 +49,8 @@ achouChave = 0
 # Aguardando mensagens
 while True:
   data, addr = sock.recvfrom(1024) 
-  print "received message:", data
-  print addr
   dados = struct.unpack('>H', data[0:2])[0]
-  print data[0:2], dados
   if dados == CLIREQ:
-    print "CLIREQ"
     # Conferir se a chave esta no dicionario proprio
     ipCliente = addr[0]
     portaCliente = addr[1]
@@ -83,24 +72,18 @@ while True:
       contador = struct.pack('>I', contMSG)
       portaString = struct.pack('>H', int(addr[1]))
       query = struct.pack('>H', QUERY) + struct.pack('>H', TTL) + tratarIP + portaString + contador + data[2:]
-      print struct.unpack('>H', query[0:2])[0],struct.unpack('>H', query[2:4])[0], struct.unpack('>H', query[8:10])[0],struct.unpack('>H', query[10:12])[0],query[14:]
-      print query
-      print "enviando aos vizinhos"
       # Envia para todos os vizinhos
       for i in arrayVizinhos:
-        #print i.split(':')[0], i.split(':')[1]
         ipVizinho = i.split(':')[0]
         portaVizinho = int(i.split(':')[1])
         sock.sendto(query, (ipVizinho,portaVizinho))
   if dados == QUERY:
-    print "QUERY"
     # Adicionando a mensagem a array de Mensagens
     ipCliente = socket.inet_ntoa(data[4:8])
     portaCliente = struct.unpack('>H', data[8:10])[0]
     sequenciaCliente = struct.unpack('>H', data[10:12])[0]
     chave = data[14:]
     mensagem = ipCliente + str(portaCliente) + str(sequenciaCliente) + chave
-
     if mensagem not in mensagensLidas:
       # Adiciona a mensagem as mensagens lidas afim de evitar repeticoes
       mensagensLidas.append(mensagem) 
